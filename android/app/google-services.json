@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "429073506263",
+    "firebase_url": "https://hungerzz.firebaseio.com",
+    "project_id": "hungerzz",
+    "storage_bucket": "hungerzz.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:429073506263:android:d12e92330601bf4011f592",
+        "android_client_info": {
+          "package_name": "com.xanjit.hungerzz"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "429073506263-8bi3ptk8pikeblgmruei4pfhb4bvfj4b.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.xanjit.hungerzz",
+            "certificate_hash": "7002d8ef5d9b97f8719446ce506bd422e1fb7ff4"
+          }
+        },
+        {
+          "client_id": "429073506263-qg316d0p94s43u5s035flb7f8hb623ha.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAuTc7iRFhK3CNajOkYYGpbMjqayQwpUe8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "429073506263-qg316d0p94s43u5s035flb7f8hb623ha.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
