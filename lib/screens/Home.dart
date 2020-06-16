@@ -1,7 +1,12 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:hungerzzz/bloc/bloc/cart_bloc.dart';
-import 'package:hungerzzz/screens/CartPage.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
+// import 'package:hungerzzz/bloc/bloc/cart_bloc.dart';
+import 'package:hungerzzz/bloc/product/product_bloc.dart';
+import 'package:hungerzzz/models/UserDetails.dart';
+import 'package:hungerzzz/repositories/ProductRepo.dart';
+// import 'package:hungerzzz/screens/CartPage.dart';
 import 'package:hungerzzz/screens/CheckoutPage.dart';
 import 'package:hungerzzz/screens/AddressPage.dart';
 import 'package:hungerzzz/shared/consts.dart';
@@ -14,7 +19,8 @@ import 'StorePage.dart';
 // import 'dart:math' as math;
 
 class Home extends StatefulWidget {
-  Home({Key key}) : super(key: key);
+ final UserDetails userDetails;
+  Home({Key key, this.userDetails}) : super(key: key);
 
   @override
   _HomeState createState() => _HomeState();
@@ -28,382 +34,507 @@ class _HomeState extends State<Home> {
 
   @override
   Widget build(BuildContext context) {
-    final GlobalKey<ScaffoldState> _scaffoldKey =
-         GlobalKey<ScaffoldState>();
+    final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
     return Scaffold(
-      backgroundColor: Colors.white,
-      key: _scaffoldKey,
-      drawer: Drawer(
-        child: ListView(
-          scrollDirection: Axis.vertical,
-          physics: BouncingScrollPhysics(),
-          children: <Widget>[
-            Container(
-                padding: EdgeInsets.symmetric(horizontal: 20),
-                height: h(context) / 4,
-                decoration: BoxDecoration(
-                  color: yellow,
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: <Widget>[
-                    Container(
-                      width: 80,
-                      height: 80,
-                      padding: EdgeInsets.all(30),
-                      // margin: EdgeInsets.only(top: 30),
-                      decoration: BoxDecoration(
-                          border: Border.all(color: Colors.white, width: 4),
-                          shape: BoxShape.circle,
-                          image: DecorationImage(
-                              image: AssetImage("assets/images/veg.jpg"),
-                              fit: BoxFit.cover,
-                              alignment: Alignment.topCenter)),
-                    ),
-                    SizedBox(width: 20),
-                    Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: <Widget>[
-                        Text("John Doe",
-                            style: TextStyle(
-                              fontSize: 25,
-                              fontWeight: FontWeight.bold,
-                            )),
-                        Text("@john_doe12",
-                            style: TextStyle(color: Colors.black87))
-                      ],
-                    )
-                  ],
-                )),
-            Container(
-                height: (h(context) - h(context) / 4) - 60,
-                child: ListView(
-                  children: <Widget>[
-                    navButton(
-                        iconData: Icons.shopping_basket, title: "My Orders"),
-                    navButton(iconData: Icons.favorite, title: "Wishlist"),
-                    navButton(iconData: Icons.history, title: "Order History"),
-                    navButton(
-                        iconData: Icons.notifications, title: "Notification"),
-                    navButton(iconData: Icons.card_giftcard, title: "Offers"),
-                    navButton(iconData: Icons.share, title: "Share"),
-                    navButton(iconData: Icons.star, title: "Rate Our App"),
-                    navButton(iconData: Icons.feedback, title: "Feedback"),
-                    navButton(iconData: Icons.info, title: "About"),
-                  ],
-                ))
-          ],
-        ),
-      ),
-      body: SingleChildScrollView(
-        physics: BouncingScrollPhysics(),
-        scrollDirection: Axis.vertical,
-        child: Container(
-          width: w(context),
-          height: h(context),
-          child: Stack(
-            alignment: Alignment.topCenter,
+        backgroundColor: Colors.white,
+        key: _scaffoldKey,
+        drawer: Drawer(
+          
+          child: ListView(
+            scrollDirection: Axis.vertical,
+            physics: BouncingScrollPhysics(),
             children: <Widget>[
-              Positioned(
-                top: h(context) * .1,
-                child: Container(
-                  width: w(context),
-                  height: h(context),
-                  child: ListView(
-                    physics: BouncingScrollPhysics(),
-                    children: <Widget>[
-                      GestureDetector(
-                          onTap: () => Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => StorePage())),
-                          child: _banner(context)),
-                      SizedBox(height: 20),
-                      Container(
-                        width: w(context),
-                        margin: EdgeInsets.symmetric(horizontal: 10),
-                        padding:
-                            EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-                        decoration: BoxDecoration(
-                            image: DecorationImage(
-                                colorFilter: new ColorFilter.mode(
-                                    Colors.black.withOpacity(0.5),
-                                    BlendMode.dstATop),
-                                image:
-                                    AssetImage("assets/images/groceries.jpg"),
-                                fit: BoxFit.cover),
-                            color: Colors.black,
-                            borderRadius: BorderRadius.circular(10)),
-                        child: Center(
-                          child: Text(
-                            "SHOP BY CATEGORY",
-                            style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 20,
-                                fontWeight: FontWeight.w500),
-                          ),
-                        ),
-                      ),
-                      SizedBox(height: 10),
-                      // SizedBox(height: 10),
-                      Container(
-                        width: w(context),
-                        // margin: EdgeInsets.symmetric(horizontal: 10),
-                        height: h(context) * .48,
-                        child: GridView.count(
-                          crossAxisCount: 2,
-                          scrollDirection: Axis.vertical,
-                          mainAxisSpacing: 10,
-                          padding: EdgeInsets.all(10),
-                          crossAxisSpacing: 10,
-                          shrinkWrap: true,
-                          physics: ScrollPhysics(),
-                          childAspectRatio: 5 / 2,
-                          children: <Widget>[
-                            _foodCat(
-                                context: context,
-                                catImage: "assets/images/fast_food.jpg",
-                                catName: "FAST FOODS"),
-                            _foodCat(
-                                context: context,
-                                catImage: "assets/images/ice_cream.jpg",
-                                catName: "ICE CREAM"),
-                            _foodCat(
-                                context: context,
-                                catImage: "assets/images/bevereges.jpg",
-                                catName: "BEVEREGES"),
-                            _foodCat(
-                                context: context,
-                                catImage: "assets/images/meat.jpg",
-                                catName: "FISH & MEAT"),
-                            _foodCat(
-                                context: context,
-                                catImage: "assets/images/snacks.jpg",
-                                catName: "SNACKS"),
-                            _foodCat(
-                                context: context,
-                                catImage: "assets/images/groceries.jpg",
-                                catName: "GROCERIES"),
-                            _foodCat(
-                                context: context,
-                                catImage: "assets/images/veg.jpg",
-                                catName: "FRUITS & VEGS"),
-                          ],
-                        ),
-                      ),
-                      productHeader(
-                          context: context,
-                          productHeader: "POPULAR",
-                          bgImage: "assets/images/bevereges.jpg",
-                          onPress: () => print("POPULAR")),
-                      SizedBox(height: 10),
-                      Container(
-                        width: w(context),
-                        // margin: EdgeInsets.symmetric(horizontal: 10),
-                        height: h(context) / 4.2,
-                        child: ListView(
-                          shrinkWrap: true,
-
-                          // crossAxisCount: 1,
-                          scrollDirection: Axis.horizontal,
-                          // mainAxisSpacing: 10,
-                          // padding: EdgeInsets.all(10),
-                          // crossAxisSpacing: 10,
-                          // shrinkWrap: true,
-                          physics: BouncingScrollPhysics(),
-                          // childAspectRatio: 3 / 2,
-                          children: <Widget>[
-                            productCardHome(
-                                context: context,
-                                productImage: "assets/images/fast_food.jpg",
-                                mPrice: 100,
-                                discount: 10,
-                                isFav: false,
-                                productTitle: "VANILLA ICE CREAM1",
-                                shopAddress:
-                                    "Radiant Food Palace,Station Road"),
-                            productCardHome(
-                                context: context,
-                                productImage: "assets/images/groceries.jpg",
-                                mPrice: 100,
-                                discount: 10,
-                                isFav: false,
-                                productTitle: "VANILLA ICE CREAM2",
-                                shopAddress:
-                                    "Radiant Food Palace,Station Road"),
-                            productCardHome(
-                                context: context,
-                                productImage: "assets/images/meat.jpg",
-                                mPrice: 100,
-                                discount: 10,
-                                isFav: false,
-                                productTitle: "VANILLA ICE CREAM3",
-                                shopAddress:
-                                    "Radiant Food Palace,Station Road"),
-                            productCardHome(
-                                context: context,
-                                productImage: "assets/images/bevereges.jpg",
-                                mPrice: 100,
-                                discount: 10,
-                                isFav: false,
-                                productTitle: "VANILLA ICE CREAM4",
-                                shopAddress:
-                                    "Radiant Food Palace,Station Road"),
-                            productCardHome(
-                                context: context,
-                                productImage: "assets/images/ice_cream.jpg",
-                                mPrice: 100,
-                                discount: 10,
-                                isFav: false,
-                                productTitle: "VANILLA ICE CREAM5",
-                                shopAddress:
-                                    "Radiant Food Palace,Station Road"),
-                          ],
-                        ),
-                      ),
-                      SizedBox(height: 30),
-                      productHeader(
-                          context: context,
-                          productHeader: "BEST SELLING",
-                          bgImage: "assets/images/veg.jpg",
-                          onPress: () => Navigator.pushNamed(context,AddressPage.id)),
-                      SizedBox(height: 10),
-                      Container(
-                        width: w(context),
-                        // margin: EdgeInsets.symmetric(horizontal: 10),
-                        height: h(context) / 4.2,
-                        child: ListView(
-                          shrinkWrap: true,
-
-                          // crossAxisCount: 1,
-                          scrollDirection: Axis.horizontal,
-                          // mainAxisSpacing: 10,
-                          // padding: EdgeInsets.all(10),
-                          // crossAxisSpacing: 10,
-                          // shrinkWrap: true,
-                          physics: BouncingScrollPhysics(),
-                          // childAspectRatio: 3 / 2,
-                          children: <Widget>[
-                            productCardHome(
-                                context: context,
-                                productImage: "assets/images/fast_food.jpg",
-                                mPrice: 100,
-                                discount: 10,
-                                isFav: false,
-                                productTitle: "VANILLA ICE CREAM6",
-                                shopAddress:
-                                    "Radiant Food Palace,Station Road"),
-                            productCardHome(
-                                context: context,
-                                productImage: "assets/images/groceries.jpg",
-                                mPrice: 100,
-                                discount: 10,
-                                isFav: false,
-                                productTitle: "VANILLA ICE CREAM7",
-                                shopAddress:
-                                    "Radiant Food Palace,Station Road"),
-                            productCardHome(
-                                context: context,
-                                productImage: "assets/images/meat.jpg",
-                                mPrice: 100,
-                                discount: 10,
-                                isFav: false,
-                                productTitle: "VANILLA ICE CREAM8",
-                                shopAddress:
-                                    "Radiant Food Palace,Station Road"),
-                            productCardHome(
-                                context: context,
-                                productImage: "assets/images/bevereges.jpg",
-                                mPrice: 100,
-                                discount: 10,
-                                isFav: false,
-                                productTitle: "VANILLA ICE CREAM9",
-                                shopAddress:
-                                    "Radiant Food Palace,Station Road"),
-                            productCardHome(
-                                context: context,
-                                productImage: "assets/images/ice_cream.jpg",
-                                mPrice: 100,
-                                discount: 10,
-                                isFav: false,
-                                productTitle: "VANILLA ICE CREAM10",
-                                shopAddress:
-                                    "Radiant Food Palace,Station Road"),
-                          ],
-                        ),
-                      ),
-                      SizedBox(height: 200)
-                    ],
-                  ),
-                ),
-              ),
-            //   BlocListener<CartBloc, CartState>(
-            // listener: (context, state) {},
-            // child: BlocBuilder<CartBloc, CartState>(builder: (context, state) {
-            //   if (state is CartInitial) {
-            //   return _appBar(context, () => _scaffoldKey.currentState.openDrawer());
-            //   }
-
-            // }
-            // )),
-_appBar(context, () => _scaffoldKey.currentState.openDrawer()),
-              Positioned(
-                bottom: 0,
-                left: 0,
-                child: Container(
+              Container(
                   padding: EdgeInsets.symmetric(horizontal: 20),
-                  width: w(context),
-                  height: h(context) * 0.07,
+                  height: h(context) / 4,
                   decoration: BoxDecoration(
-                      borderRadius:
-                          BorderRadius.vertical(top: Radius.circular(30)),
-                      color: Colors.black,
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.1),
-                          offset: Offset(0, -5),
-                          blurRadius: 30,
-                        )
-                      ]),
+                    color: yellow,
+                  ),
                   child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    mainAxisAlignment: MainAxisAlignment.start,
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: <Widget>[
-                      InkWell(
-                          onTap: () =>
-                              Navigator.pushNamed(context, AddressPage.id),
-                          child: _bottomNavButton(iconData: Icons.search)),
-                      _bottomNavButton(iconData: Icons.favorite_border)
+                      Container(
+                          // padding: EdgeInsets.symmetric(horizontal: 15),
+                          margin: EdgeInsets.all(0),
+                          height: h(context) / 4,
+                          decoration: BoxDecoration(
+                            color: yellow,
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: <Widget>[
+                              Container(
+                                width: 60,
+                                height: 60,
+                                // padding: EdgeInsets.all(10),
+                                // margin: EdgeInsets.only(top: 30),
+                                decoration: BoxDecoration(
+                                  border:
+                                      Border.all(color: Colors.white, width: 4),
+                                  shape: BoxShape.circle,
+                                ),
+                                child: ClipOval(
+                                  child: CachedNetworkImage(
+                                      fit: BoxFit.cover,
+                                      alignment: Alignment.topCenter,
+                                      placeholder: (context, url) {
+                                        return SpinKitCircle(
+                                          color: Colors.black,
+                                        );
+                                      },
+                                      imageUrl: widget.userDetails.displayPic),
+                                ),
+                              ),
+                              SizedBox(width: 20),
+                              Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: <Widget>[
+                                  Text(widget.userDetails.username,
+                                      softWrap: true,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: TextStyle(
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.bold,
+                                      )),
+                                  Text(widget.userDetails.email,
+                                      softWrap: true,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: TextStyle(color: Colors.black87))
+                                ],
+                              )
+                            ],
+                          ))])),
+              Container(
+                  height: (h(context) - h(context) / 4) - 60,
+                  child: ListView(
+                    children: <Widget>[
+                      navButton(
+                          iconData: Icons.shopping_basket, title: "My Orders"),
+                      navButton(iconData: Icons.favorite, title: "Wishlist"),
+                      navButton(
+                          iconData: Icons.history, title: "Order History"),
+                      navButton(
+                          iconData: Icons.notifications, title: "Notification"),
+                      navButton(iconData: Icons.card_giftcard, title: "Offers"),
+                      navButton(iconData: Icons.share, title: "Share"),
+                      navButton(iconData: Icons.star, title: "Rate Our App"),
+                      navButton(iconData: Icons.feedback, title: "Feedback"),
+                      navButton(iconData: Icons.info, title: "About"),
                     ],
-                  ),
-                ),
-              ),
-              Align(
-                alignment: Alignment.bottomCenter,
-                child: GestureDetector(
-                  onTap: () => {},
-                  child: Container(
-                    padding: EdgeInsets.all(20),
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      border: Border.all(width: 3, color: Colors.white),
-                      color: Colors.black,
-                    ),
-                    child: Icon(
-                      Icons.home,
-                      size: 25,
-                      color: Colors.white,
-                    ),
-                  ),
-                ),
-              ),
+                  ))
             ],
           ),
         ),
-      ),
-    );
+        body: MultiBlocProvider(
+          providers: [
+            BlocProvider(
+              create: (context) => ProductBloc(productRepo: ProductRepo())
+                ..add(ProductStartPopular()),
+            ),
+          ],
+          child: SingleChildScrollView(
+            physics: BouncingScrollPhysics(),
+            scrollDirection: Axis.vertical,
+            child: Container(
+              width: w(context),
+              height: h(context),
+              child: Stack(
+                alignment: Alignment.topCenter,
+                children: <Widget>[
+                  Positioned(
+                    top: h(context) * .1,
+                    child: Container(
+                      width: w(context),
+                      height: h(context),
+                      child: ListView(
+                        physics: BouncingScrollPhysics(),
+                        children: <Widget>[
+                          GestureDetector(
+                              onTap: () => Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => StorePage())),
+                              child: _banner(context)),
+                          SizedBox(height: 20),
+                          Container(
+                            width: w(context),
+                            margin: EdgeInsets.symmetric(horizontal: 10),
+                            padding: EdgeInsets.symmetric(
+                                horizontal: 10, vertical: 10),
+                            decoration: BoxDecoration(
+                                image: DecorationImage(
+                                    colorFilter: new ColorFilter.mode(
+                                        Colors.black.withOpacity(0.5),
+                                        BlendMode.dstATop),
+                                    image: AssetImage(
+                                        "assets/images/groceries.jpg"),
+                                    fit: BoxFit.cover),
+                                color: Colors.black,
+                                borderRadius: BorderRadius.circular(10)),
+                            child: Center(
+                              child: Text(
+                                "SHOP BY CATEGORY",
+                                style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.w500),
+                              ),
+                            ),
+                          ),
+                          SizedBox(height: 10),
+                          // SizedBox(height: 10),
+                          Container(
+                            width: w(context),
+                            // margin: EdgeInsets.symmetric(horizontal: 10),
+                            height: h(context) * .48,
+                            child: GridView.count(
+                              crossAxisCount: 2,
+                              scrollDirection: Axis.vertical,
+                              mainAxisSpacing: 10,
+                              padding: EdgeInsets.all(10),
+                              crossAxisSpacing: 10,
+                              shrinkWrap: true,
+                              physics: ScrollPhysics(),
+                              childAspectRatio: 5 / 2,
+                              children: <Widget>[
+                                _foodCat(
+                                    context: context,
+                                    catImage: "assets/images/fast_food.jpg",
+                                    catName: "FAST FOODS"),
+                                _foodCat(
+                                    context: context,
+                                    catImage: "assets/images/ice_cream.jpg",
+                                    catName: "ICE CREAM"),
+                                _foodCat(
+                                    context: context,
+                                    catImage: "assets/images/bevereges.jpg",
+                                    catName: "BEVEREGES"),
+                                _foodCat(
+                                    context: context,
+                                    catImage: "assets/images/meat.jpg",
+                                    catName: "FISH & MEAT"),
+                                _foodCat(
+                                    context: context,
+                                    catImage: "assets/images/snacks.jpg",
+                                    catName: "SNACKS"),
+                                _foodCat(
+                                    context: context,
+                                    catImage: "assets/images/groceries.jpg",
+                                    catName: "GROCERIES"),
+                                _foodCat(
+                                    context: context,
+                                    catImage: "assets/images/veg.jpg",
+                                    catName: "FRUITS & VEGS"),
+                              ],
+                            ),
+                          ),
+                          // productHeader(
+                          //     context: context,
+                          //     productHeader: "POPULAR",
+                          //     bgImage: "assets/images/bevereges.jpg",
+                          //     onPress: () => print("POPULAR")),
+                          // SizedBox(height: 10),
+                          // Container(
+                          //   width: w(context),
+                          //   // margin: EdgeInsets.symmetric(horizontal: 10),
+                          //   height: h(context) / 4.2,
+                          //   child: ListView(
+                          //     shrinkWrap: true,
+
+                          //     // crossAxisCount: 1,
+                          //     scrollDirection: Axis.horizontal,
+                          //     // mainAxisSpacing: 10,
+                          //     // padding: EdgeInsets.all(10),
+                          //     // crossAxisSpacing: 10,
+                          //     // shrinkWrap: true,
+                          //     physics: BouncingScrollPhysics(),
+                          //     // childAspectRatio: 3 / 2,
+                          //     children: <Widget>[
+                          //       productCardHome(
+                          //           context: context,
+                          //           productImage: "assets/images/fast_food.jpg",
+                          //           mPrice: 100,
+                          //           discount: 10,
+                          //           isFav: false,
+                          //           productTitle: "VANILLA ICE CREAM1",
+                          //           shopAddress:
+                          //               "Radiant Food Palace,Station Road"),
+                          //       productCardHome(
+                          //           context: context,
+                          //           productImage: "assets/images/groceries.jpg",
+                          //           mPrice: 100,
+                          //           discount: 10,
+                          //           isFav: false,
+                          //           productTitle: "VANILLA ICE CREAM2",
+                          //           shopAddress:
+                          //               "Radiant Food Palace,Station Road"),
+                          //       productCardHome(
+                          //           context: context,
+                          //           productImage: "assets/images/meat.jpg",
+                          //           mPrice: 100,
+                          //           discount: 10,
+                          //           isFav: false,
+                          //           productTitle: "VANILLA ICE CREAM3",
+                          //           shopAddress:
+                          //               "Radiant Food Palace,Station Road"),
+                          //       productCardHome(
+                          //           context: context,
+                          //           productImage: "assets/images/bevereges.jpg",
+                          //           mPrice: 100,
+                          //           discount: 10,
+                          //           isFav: false,
+                          //           productTitle: "VANILLA ICE CREAM4",
+                          //           shopAddress:
+                          //               "Radiant Food Palace,Station Road"),
+                          //       productCardHome(
+                          //           context: context,
+                          //           productImage: "assets/images/ice_cream.jpg",
+                          //           mPrice: 100,
+                          //           discount: 10,
+                          //           isFav: false,
+                          //           productTitle: "VANILLA ICE CREAM5",
+                          //           shopAddress:
+                          //               "Radiant Food Palace,Station Road"),
+                          //     ],
+                          //   ),
+                          // ),
+                          BlocListener<ProductBloc, ProductState>(
+                              listener: (context, state) {},
+                              child: BlocBuilder<ProductBloc, ProductState>(
+                                builder: (context, state) {
+                                  if (state is ProductLoading) {
+                                    return Center(
+                                      child: SpinKitChasingDots(color: yellow),
+                                    );
+                                  } else if (state is ProductLoaded) {
+                                    if (state.products.length == 0) {
+                                      return Center(
+                                        child: Column(
+                                          children: [
+                                            SizedBox(
+                                              height: h(context) / 10,
+                                            ),
+                                            Text(
+                                              "NO PRODUCT ADDED",
+                                              style: TextStyle(
+                                                  color: Colors.black,
+                                                  fontSize: 20,
+                                                  fontWeight: FontWeight.w400),
+                                            ),
+                                            SizedBox(
+                                              height: 20,
+                                            ),
+                                          ],
+                                        ),
+                                      );
+                                    }
+                                    return Column(
+                                      children: [
+                                        productHeader(
+                                            context: context,
+                                            onPress: () {
+                                              // Navigator.push(
+                                              //     context,
+                                              //     MaterialPageRoute(
+                                              //         builder: (context) => Products(
+                                              //             uid: state
+                                              //                 .products[0]
+                                              //                 .storeId)));
+                                            },
+                                            productHeader: "Recently Added"),
+                                        SizedBox(height: 10),
+                                        Container(
+                                          width: w(context),
+
+                                          // margin: EdgeInsets.symmetric(horizontal: 10),
+
+                                          height: h(context) / 4.2,
+
+                                          child: ListView.builder(
+                                            itemCount: state.products.length,
+
+                                            shrinkWrap: true,
+
+                                            // crossAxisCount: 1,
+
+                                            scrollDirection: Axis.horizontal,
+
+                                            // mainAxisSpacing: 10,
+
+                                            // padding: EdgeInsets.all(10),
+
+                                            // crossAxisSpacing: 10,
+
+                                            // shrinkWrap: true,
+
+                                            physics: BouncingScrollPhysics(),
+
+                                            // childAspectRatio: 3 / 2,
+
+                                            itemBuilder: (context, i) {
+                                              return productCardHome(
+                                                context: context,
+                                                product: state.products[i],
+                                              );
+                                            },
+                                          ),
+                                        ),
+                                      ],
+                                    );
+                                  } else if (state is ProductError) {
+                                    return Center(
+                                      child: Text(state.error),
+                                    );
+                                  } else {
+                                    return Container();
+                                  }
+                                },
+                              )),
+                          SizedBox(height: 30),
+                          // productHeader(
+                          //     context: context,
+                          //     productHeader: "BEST SELLING",
+                          //     bgImage: "assets/images/veg.jpg",
+                          //     onPress: () => Navigator.pushNamed(context,AddressPage.id)),
+                          // SizedBox(height: 10),
+                          // Container(
+                          //   width: w(context),
+                          //   // margin: EdgeInsets.symmetric(horizontal: 10),
+                          //   height: h(context) / 4.2,
+                          //   child: ListView(
+                          //     shrinkWrap: true,
+
+                          //     // crossAxisCount: 1,
+                          //     scrollDirection: Axis.horizontal,
+                          //     // mainAxisSpacing: 10,
+                          //     // padding: EdgeInsets.all(10),
+                          //     // crossAxisSpacing: 10,
+                          //     // shrinkWrap: true,
+                          //     physics: BouncingScrollPhysics(),
+                          //     // childAspectRatio: 3 / 2,
+                          //     children: <Widget>[
+                          //       productCardHome(
+                          //           context: context,
+                          //           productImage: "assets/images/fast_food.jpg",
+                          //           mPrice: 100,
+                          //           discount: 10,
+                          //           isFav: false,
+                          //           productTitle: "VANILLA ICE CREAM6",
+                          //           shopAddress:
+                          //               "Radiant Food Palace,Station Road"),
+                          //       productCardHome(
+                          //           context: context,
+                          //           productImage: "assets/images/groceries.jpg",
+                          //           mPrice: 100,
+                          //           discount: 10,
+                          //           isFav: false,
+                          //           productTitle: "VANILLA ICE CREAM7",
+                          //           shopAddress:
+                          //               "Radiant Food Palace,Station Road"),
+                          //       productCardHome(
+                          //           context: context,
+                          //           productImage: "assets/images/meat.jpg",
+                          //           mPrice: 100,
+                          //           discount: 10,
+                          //           isFav: false,
+                          //           productTitle: "VANILLA ICE CREAM8",
+                          //           shopAddress:
+                          //               "Radiant Food Palace,Station Road"),
+                          //       productCardHome(
+                          //           context: context,
+                          //           productImage: "assets/images/bevereges.jpg",
+                          //           mPrice: 100,
+                          //           discount: 10,
+                          //           isFav: false,
+                          //           productTitle: "VANILLA ICE CREAM9",
+                          //           shopAddress:
+                          //               "Radiant Food Palace,Station Road"),
+                          //       productCardHome(
+                          //           context: context,
+                          //           productImage: "assets/images/ice_cream.jpg",
+                          //           mPrice: 100,
+                          //           discount: 10,
+                          //           isFav: false,
+                          //           productTitle: "VANILLA ICE CREAM10",
+                          //           shopAddress:
+                          //               "Radiant Food Palace,Station Road"),
+                          //     ],
+                          //   ),
+                          // ),
+                          SizedBox(height: 200)
+                        ],
+                      ),
+                    ),
+                  ),
+                  //   BlocListener<CartBloc, CartState>(
+                  // listener: (context, state) {},
+                  // child: BlocBuilder<CartBloc, CartState>(builder: (context, state) {
+                  //   if (state is CartInitial) {
+                  //   return _appBar(context, () => _scaffoldKey.currentState.openDrawer());
+                  //   }
+
+                  // }
+                  // )),
+                  _appBar(
+                      context, () => _scaffoldKey.currentState.openDrawer()),
+                  Positioned(
+                    bottom: 0,
+                    left: 0,
+                    child: Container(
+                      padding: EdgeInsets.symmetric(horizontal: 20),
+                      width: w(context),
+                      height: h(context) * 0.07,
+                      decoration: BoxDecoration(
+                          borderRadius:
+                              BorderRadius.vertical(top: Radius.circular(30)),
+                          color: Colors.black,
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.1),
+                              offset: Offset(0, -5),
+                              blurRadius: 30,
+                            )
+                          ]),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: <Widget>[
+                          InkWell(
+                              onTap: () =>
+                                  Navigator.pushNamed(context, AddressPage.id),
+                              child: _bottomNavButton(iconData: Icons.search)),
+                          _bottomNavButton(iconData: Icons.favorite_border)
+                        ],
+                      ),
+                    ),
+                  ),
+                  Align(
+                    alignment: Alignment.bottomCenter,
+                    child: GestureDetector(
+                      onTap: () => {},
+                      child: Container(
+                        padding: EdgeInsets.all(20),
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          border: Border.all(width: 3, color: Colors.white),
+                          color: Colors.black,
+                        ),
+                        child: Icon(
+                          Icons.home,
+                          size: 25,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ));
   }
 
   Container navButton({bool isActive, String title, IconData iconData}) {
@@ -826,11 +957,12 @@ _appBar(context, () => _scaffoldKey.currentState.openDrawer()),
               alignment: Alignment.topRight,
               children: <Widget>[
                 IconButton(
-                    icon: Icon(
-                      Icons.shopping_cart,
-                      color: Colors.black87,
-                    ),
-                    onPressed: () => Navigator.pushNamed(context, CartPage.id)),
+                  icon: Icon(
+                    Icons.shopping_cart,
+                    color: Colors.black87,
+                  ),
+                  // onPressed: () => Navigator.pushNamed(context, CartPage.id)
+                ),
                 Positioned(
                   top: 0,
                   right: 0,

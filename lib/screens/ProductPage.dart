@@ -1,7 +1,10 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:hungerzzz/bloc/bloc/cart_bloc.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
+// import 'package:flutter_bloc/flutter_bloc.dart';
+// import 'package:hungerzzz/bloc/bloc/cart_bloc.dart';
 import 'package:hungerzzz/models/Product.dart';
+import 'package:hungerzzz/repositories/StoreRepo.dart';
 import 'package:hungerzzz/screens/StorePage.dart';
 import 'package:hungerzzz/shared/consts.dart';
 
@@ -16,20 +19,33 @@ class ProductPage extends StatefulWidget {
 class _ProductPageState extends State<ProductPage> {
   int price;
   int quantity;
+  String storeName;
+  StoreRepo _storeRepo  = StoreRepo();
+
   bool isAddedtoCart;
   @override
   void initState() {
     super.initState();
     quantity = 1;
     isAddedtoCart = false;
-    price = ((widget.product.discount / widget.product.productMPrice) * 100)
+    price = (widget.product.productMPrice-((widget.product.discount / widget.product.productMPrice) * 100))
         .floor();
+       
   }
+Future getStoreName()
+async{
+  String sName = await _storeRepo.getStoreName(storeId: widget.product.storeId);
+  
+setState(() {
+  storeName = sName;
+  
+});
 
+}
   void increment() {
     setState(() {
       quantity += 1;
-      widget.product.productQuantity = quantity;
+      // widget.product.productQuantity = quantity;
     });
   }
 
@@ -37,13 +53,15 @@ class _ProductPageState extends State<ProductPage> {
     setState(() {
       if (quantity >= 2) {
         quantity -= 1;
-        widget.product.productQuantity = quantity;
+        // widget.product.productQuantity = quantity;
       }
     });
   }
 
   @override
   Widget build(BuildContext context) {
+      getStoreName();
+        print(storeName);
     return Scaffold(
         body: Container(
             width: w(context),
@@ -60,7 +78,7 @@ class _ProductPageState extends State<ProductPage> {
                       // borderRadius: BorderRadius.circular(30),
 
                       image: DecorationImage(
-                          image: AssetImage(widget.product.productImage),
+                          image: CachedNetworkImageProvider(widget.product.productImage),
                           fit: BoxFit.cover),
                       color: yellow,
                       borderRadius:
@@ -193,21 +211,38 @@ class _ProductPageState extends State<ProductPage> {
                             context,
                             MaterialPageRoute(
                                 builder: (context) => StorePage())),
-                        child: Text("${widget.product.storeId}",
+                        child: Text("${widget.product.productCategory}",
                             style: TextStyle(
                                 color: Colors.black.withOpacity(.5),
                                 fontSize: 20)),
                       ),
-                      Row(
-                        children: <Widget>[
-                          Icon(
-                            Icons.location_on,
-                            color: yellow,
-                          ),
-                          Text("KOKRAJHAR",
-                              style: TextStyle(color: yellow, fontSize: 20))
-                        ],
-                      ),
+//                       StreamBuilder<String>(
+//                         stream: StoreRepo().getStoreName(storeId:widget.product.storeId) ,
+//                         initialData: "No store Name" ,
+//                         builder: (BuildContext context, AsyncSnapshot snapshot){
+//                           if(snapshot.connectionState ==ConnectionState.waiting){
+// return SpinKitDualRing(color: yellow);
+//                           }
+//                                   else if(snapshot.hasData)        
+//                                   { return   Row(
+//                           children: <Widget>[
+//                             Icon(
+//                               Icons.store,
+//                               color: Colors.black,
+//                             ),
+//                             Text(snapshot.data,
+//                                 style: TextStyle(color: Colors.black, fontSize: 20))
+//                           ],
+//                         );
+//                                   }
+//                                   else if(snapshot.hasError)
+//                                   {
+//                                    return Text(snapshot.error.toString());
+//                                   }
+//                         },
+//                       ),
+                            
+                     
                       SizedBox(height: 10),
                       Row(
                         children: <Widget>[
@@ -270,9 +305,9 @@ class _ProductPageState extends State<ProductPage> {
                               borderRadius: BorderRadius.circular(30)),
                           child: InkWell(
                             onTap: () {
-                              BlocProvider.of<CartBloc>(context)
-                                ..add(AddtoCart(product: widget.product));
-                              print(widget.product.productQuantity);
+                              // BlocProvider.of<CartBloc>(context)
+                              //   ..add(AddtoCart(product: widget.product));
+                              // print(widget.product.productQuantity);
                             },
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.center,
